@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章详情</title>
+    <script src="https://cdn.tailwindcss.com/3.3.3"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        
+        .blog-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        .btn-outline {
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-outline:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        
+        .tag {
+            background-color: #f1f5f9;
+            color: #64748b;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        
+        .tag:hover {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .reading-progress {
+            height: 3px;
+            background-color: #3b82f6;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Markdown样式增强 */
+        .article-content h1, .article-content h2, .article-content h3, .article-content h4, .article-content h5, .article-content h6 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        
+        .article-content h1 {
+            font-size: 2rem;
+        }
+        
+        .article-content h2 {
+            font-size: 1.5rem;
+        }
+        
+        .article-content h3 {
+            font-size: 1.25rem;
+        }
+        
+        .article-content blockquote {
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+            margin-left: 0;
+            margin-right: 0;
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .article-content pre {
+            background-color: #f1f5f9;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            overflow-x: auto;
+            margin-bottom: 1.25rem;
+        }
+        
+        .article-content code {
+            background-color: #f1f5f9;
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.875rem;
+        }
+        
+        .article-content pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        
+        .article-content ul, .article-content ol {
+            margin-bottom: 1.25rem;
+            padding-left: 1.5rem;
+        }
+        
+        .article-content li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .article-content a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        
+        .article-content a:hover {
+            text-decoration: underline;
+        }
+        
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.375rem;
+            margin-bottom: 1.25rem;
+        }
+        
+        .article-content p {
+            margin-bottom: 1.25rem;
+            color: #475569;
+        }
+    </style>
+</head>
+<body>
+    <!-- 阅读进度条 -->
+    <div class="reading-progress" id="readingProgress"></div>
+    
+    <!-- 主要内容区域 -->
+    <main class="min-h-screen">
+        <div class="blog-container py-8">
+            <!-- 文章详情区域 -->
+            <section id="articleDetail" class="fade-in">
+                <!-- 文章详情页英雄区域 -->
+                <section id="articleHeroSection" class="relative h-96 flex items-center justify-center mb-8 overflow-hidden rounded-xl">
+                    <div class="absolute inset-0 z-0">
+                        <img id="articleDetailHeroImage" alt="文章封面" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+                    </div>
+                    <div class="relative z-10 text-center text-white px-4 max-w-4xl">
+                        <h1 id="articleDetailHeroTitle" class="text-3xl md:text-5xl font-bold mb-4 leading-tight"></h1>
+                        <div class="flex items-center justify-center space-x-4 text-sm md:text-base">
+                            <span id="articleDetailHeroAuthor" class="flex items-center">
+                                <i class="fas fa-user mr-1"></i> <span id="heroAuthorName"></span>
+                            </span>
+                            <span class="opacity-70">•</span>
+                            <span id="articleDetailHeroDate" class="flex items-center">
+                                <i class="far fa-calendar mr-1"></i> <span id="heroPublishDate"></span>
+                            </span>
+                            <span class="opacity-70">•</span>
+                            <span id="articleDetailHeroReadTime" class="flex items-center">
+                                <i class="far fa-clock mr-1"></i> <span id="heroReadTime"></span>
+                            </span>
+                        </div>
+                    </div>
+                </section>
+                
+                <div class="flex items-center mb-6">
+                    <button id="backToList" class="btn-outline inline-flex items-center mr-4">
+                        <i class="fas fa-arrow-left mr-2"></i> 返回列表
+                    </button>
+                    <span class="text-sm text-gray-500" id="articleCategory">分类：<span id="categoryText"></span></span>
+                </div>
+                
+                <article class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="p-8 md:p-12">
+                        <div class="flex flex-wrap items-center justify-between mb-8 pb-6 border-b border-gray-100">
+                            <div class="flex items-center mb-4 md:mb-0">
+                                <img id="articleAuthorImage" alt="作者头像" class="w-12 h-12 rounded-full mr-4">
+                                <div>
+                                    <div id="articleAuthorName" class="font-medium text-gray-800"></div>
+                                    <div id="articlePublishDate" class="text-sm text-gray-500"></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <span id="articleReadTime" class="text-sm text-gray-500"><i class="far fa-clock mr-1"></i> <span id="readTimeText"></span></span>
+                            </div>
+                        </div>
+                        
+                        <!-- 动态渲染的Markdown内容 -->
+                        <div id="articleContent" class="article-content prose prose-lg max-w-none"></div>
+                        
+                        <div class="mt-10 pt-8 border-t border-gray-100">
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                <span class="text-sm font-medium text-gray-700">标签：</span>
+                                <div id="articleTags" class="flex flex-wrap gap-2"></div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <div class="flex space-x-4">
+                                    <button class="text-gray-500 hover:text-blue-500 transition-colors">
+                                        <i class="far fa-thumbs-up text-xl"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-blue-500 transition-colors">
+                                        <i class="far fa-bookmark text-xl"></i>
+                                    </button>
+                                    <button id="shareButton" class="text-gray-500 hover:text-blue-500 transition-colors">
+                                        <i class="far fa-share-square text-xl"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 分享成功提示 -->
+                            <div id="shareSuccessToast" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-80 text-white px-6 py-4 rounded-lg z-50 hidden">
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-circle mr-2"></i>
+                                    <span>链接复制成功，快去分享吧！</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </div>
+    </main>
+    
+    <!-- JavaScript -->
+    <script>
+        // 文章数据
+        const articleData = {
+            filename: "3.md",
+            title: "超酷特效代码一键get！",
+            category: "代码",
+            markdownContent: `#  超酷特效代码一键get！
+
+你的创意工具箱——[code.20066666.xyz](https://code.20066666.xyz/)上线啦
+
+还在为找不到好看的网页特效代码发愁？想给项目添点节日氛围、浪漫元素，却苦于从零编写代码耗时费力？今天给大家安利一个宝藏代码展示网站——<https://code.20066666.xyz/，这里有超多现成的高颜值特效代码，一键下载就能直接用，不管是新手入门练手，还是开发者快速丰富项目效果，都能满足你的需求！>
+
+ 
+
+打开网站就能感受到满满的实用干货，目前已上线多款热门特效代码，每一款都经过精心打磨，效果惊艳又易上手：
+
+ 
+
+## 节日氛围组必备：圣诞主题特效
+
+临近圣诞，想要给网页换上节日盛装？网站的圣诞系列代码绝对能让你眼前一亮！
+
+\- **经典圣诞树（下载编号01）**：由AE制作的圣诞树立体特效，细节丰富，光影感十足，嵌入网页瞬间拉满节日氛围，不管是个人博客装饰，还是商业网站节日专题，都能无缝适配。
+
+\- **蓝色圣诞树（下载编号02）**：专为移动端优化的高颜值蓝色圣诞树，清新独特的色调搭配流畅动画，在手机端展示效果更佳，适配各类移动场景，让小屏幕也能拥有满满圣诞感。
+
+\- **礼物圣诞树（下载编号03）**：将圣诞礼物与圣诞树创意结合，可爱又温馨的设计，适合电商促销页面、儿童主题网站，或是给朋友的专属祝福网页，自带治愈感。
+
+ 
+
+## 浪漫氛围拉满：爱心系列特效
+
+想表达心意？或是打造浪漫风格的网页？爱心系列代码堪称点睛之笔：
+
+\- **爱心窗口代码**：简约而不简单的爱心窗口设计，可作为网页弹窗、加载界面，或是单独作为装饰元素，低调又浪漫，适配多种场景。
+
+\- **跳动爱心文字网页代码**：动态跳动的爱心搭配文字展示，文字与爱心动画完美融合，适合表白网页、情侣博客、婚恋相关项目，让文字也能传递心动感。
+
+ 
+
+### 为什么推荐这个代码网站？
+
+1\. **操作简单，上手无门槛**：每款代码都提供“查看代码”和“演示”功能，先看效果再下载，满意再使用；下载链接复制便捷，还支持网盘获取完整代码，密码统一为5252，无需复杂操作。
+
+2\. **实用性强，适配多场景**：不管是节日装饰、浪漫表达，还是日常网页美化，都能找到对应的特效代码，移动端和PC端均有适配选项（如蓝色圣诞树专为手机优化）。
+
+3\. **版权清晰，使用无忧**：网站所有代码均为<span data-name="copyright" data-type="emoji">©</span>2025 [chouye版权所有，如有侵权问题可联系官方邮箱xiao@chouye.dpdns.org](mailto:chouye版权所有，如有侵权问题可联系官方邮箱xiao@chouye.dpdns.org)处理，让你放心使用，避免版权纠纷。
+
+ 
+
+目前网站还在持续更新更多优质代码项目，后续会有更多实用、炫酷的特效上线！不管你是前端开发者、设计爱好者，还是想给网页加点“小心思”的普通用户，都赶紧收藏<https://code.20066666.xyz/吧～> 把好用的代码分享给身边的朋友，一起让网页设计更简单、更出彩！
+
+ 
+
+如果使用过程中有任何问题，或是有想要的特效代码需求，都可以联系网站管理团队，说不定下一个上线的代码就是为你定制的哦～`,
+            author: "小瘦金",
+            authorImage: "https://p26-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/409aa03553814ade942e5f19f660a55e.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251218213532CC70DC2DB176A6EB14F5&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1766669732&x-signature=SkOTPJdSwJXtBMVfTiw4qrDk4rk%3D",
+            publishDate: "2025-12-20",
+            readTime: "5分钟阅读",
+            image: "../images/3.png",
+            tags: [ "分享", "代码"]
+        };
+
+        // 页面加载完成后渲染数据
+        document.addEventListener('DOMContentLoaded', function() {
+            // 填充英雄区域数据
+            document.getElementById('articleDetailHeroImage').src = articleData.image;
+            document.getElementById('articleDetailHeroTitle').textContent = articleData.title;
+            document.getElementById('heroAuthorName').textContent = articleData.author;
+            document.getElementById('heroPublishDate').textContent = articleData.publishDate;
+            document.getElementById('heroReadTime').textContent = articleData.readTime;
+
+            // 填充分类
+            document.getElementById('categoryText').textContent = articleData.category;
+
+            // 填充作者信息
+            document.getElementById('articleAuthorImage').src = articleData.authorImage;
+            document.getElementById('articleAuthorName').textContent = articleData.author;
+            document.getElementById('articlePublishDate').textContent = `发布于 ${articleData.publishDate}`;
+            document.getElementById('readTimeText').textContent = articleData.readTime;
+
+            // 渲染Markdown内容
+            const articleContent = document.getElementById('articleContent');
+            articleContent.innerHTML = marked.parse(articleData.markdownContent);
+
+            // 渲染标签
+            const tagsContainer = document.getElementById('articleTags');
+            articleData.tags.forEach(tag => {
+                const tagLink = document.createElement('a');
+                tagLink.href = '#';
+                tagLink.className = 'tag';
+                tagLink.textContent = tag;
+                tagsContainer.appendChild(tagLink);
+            });
+        });
+
+        // 阅读进度条功能
+        window.addEventListener('scroll', function() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("readingProgress").style.width = scrolled + "%";
+        });
+
+        // 返回列表按钮
+        document.getElementById('backToList').addEventListener('click', function() {
+            window.location.href = '../index.html';
+        });
+
+        // 分享功能
+        document.getElementById('shareButton').addEventListener('click', function() {
+            navigator.clipboard.writeText(window.location.href).then(function() {
+                const toast = document.getElementById('shareSuccessToast');
+                toast.classList.remove('hidden');
+                setTimeout(function() {
+                    toast.classList.add('hidden');
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小瘦金个人博客</title>
+    <script src="https://cdn.tailwindcss.com/3.3.3"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        
+        .blog-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .nav-scrolled {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline {
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-outline:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6;
+        }
+        
+        .tag {
+            background-color: #f1f5f9;
+            color: #64748b;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        
+        .tag:hover {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .article-content h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #0f172a;
+        }
+        
+        .article-content p {
+            margin-bottom: 1.25rem;
+            color: #475569;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .reading-progress {
+            height: 3px;
+            background-color: #3b82f6;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Markdown样式增强 */
+        .article-content h1, .article-content h2, .article-content h3, .article-content h4, .article-content h5, .article-content h6 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        
+        .article-content h1 {
+            font-size: 2rem;
+        }
+        
+        .article-content h2 {
+            font-size: 1.5rem;
+        }
+        
+        .article-content h3 {
+            font-size: 1.25rem;
+        }
+        
+        .article-content blockquote {
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+            margin-left: 0;
+            margin-right: 0;
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .article-content pre {
+            background-color: #f1f5f9;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            overflow-x: auto;
+            margin-bottom: 1.25rem;
+        }
+        
+        .article-content code {
+            background-color: #f1f5f9;
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.875rem;
+        }
+        
+        .article-content pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        
+        .article-content ul, .article-content ol {
+            margin-bottom: 1.25rem;
+            padding-left: 1.5rem;
+        }
+        
+        .article-content li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .article-content a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        
+        .article-content a:hover {
+            text-decoration: underline;
+        }
+        
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.375rem;
+            margin-bottom: 1.25rem;
+        }
+        
+        /* 排序按钮样式 */
+        .sort-btn {
+            background-color: #f1f5f9;
+            color: #64748b;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .sort-btn:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .sort-btn.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        /* 左侧边栏样式 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 280px;
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            z-index: 50;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        /* 移动端侧边栏 */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar-toggle {
+                display: block;
+            }
+        }
+
+        /* 桌面端布局 */
+        @media (min-width: 769px) {
+            .main-content {
+                margin-left: 280px;
+                width: calc(100% - 280px);
+            }
+            
+            .sidebar-toggle {
+                display: none;
+            }
+        }
+
+        /* 侧边栏切换按钮 */
+        .sidebar-toggle {
+            position: fixed;
+            right: 1rem;
+            top: 1rem;
+            z-index: 60;
+            background-color: white;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar-toggle:hover {
+            background-color: #f1f5f9;
+            transform: scale(1.05);
+        }
+
+        /* 侧边栏遮罩 */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 49;
+            display: none;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 阅读进度条 -->
+    <div class="reading-progress" id="readingProgress"></div>
+    
+    <!-- 侧边栏遮罩 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- 侧边栏切换按钮 -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars text-xl text-gray-700"></i>
+    </button>
+    
+    <!-- 左侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="p-6">
+            <!-- 作者信息 -->
+            <div class="text-center mb-8">
+                <div class="relative">
+                    <img src="https://p26-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/409aa03553814ade942e5f19f660a55e.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251218213532CC70DC2DB176A6EB14F5&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1766669732&x-signature=SkOTPJdSwJXtBMVfTiw4qrDk4rk%3D" alt="博主头像" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-blue-100">
+                    <div id="adminBadge" class="absolute -top-2 -left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full hidden">管理员</div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-1">小瘦金</h3>
+                <p class="text-sm text-gray-500 mb-4">探索生活的意义与美好</p>
+                <div class="flex justify-center space-x-3">
+                    <a href="https://space.bilibili.com/1167260492?spm_id_from=333.1007.0.0" target="_blank" class="text-gray-400 hover:text-blue-500 transition-colors">
+                        <i class="fab fa-bilibili"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 导航 -->
+            <div class="mb-8">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-compass mr-2 text-blue-500"></i> 导航
+                </h3>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="#" id="homeLink" class="flex items-center text-gray-600 hover:text-blue-500 transition-colors py-2">
+                            <i class="fas fa-home mr-3 w-5 text-center"></i> 首页
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center text-gray-600 hover:text-blue-500 transition-colors py-2">
+                            <i class="fas fa-folder-open mr-3 w-5 text-center"></i> 分类
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center text-gray-600 hover:text-blue-500 transition-colors py-2">
+                            <i class="fas fa-tags mr-3 w-5 text-center"></i> 标签
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center text-gray-600 hover:text-blue-500 transition-colors py-2">
+                            <i class="fas fa-user mr-3 w-5 text-center"></i> 关于
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- 分类 -->
+            <div class="mb-8">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-folder-open mr-2 text-blue-500"></i> 分类
+                </h3>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="#" class="text-gray-600 hover:text-blue-500 transition-colors category-link" data-category="旅行">
+                            <span>旅行</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-600 hover:text-blue-500 transition-colors category-link" data-category="思考">
+                            <span>思考</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-600 hover:text-blue-500 transition-colors category-link" data-category="效率">
+                            <span>效率</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-600 hover:text-blue-500 transition-colors category-link" data-category="生活">
+                            <span>生活</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-600 hover:text-blue-500 transition-colors category-link" data-category="阅读">
+                            <span>阅读</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-600 hover:text-blue-500 transition-colors category-link" data-category="其他">
+                            <span>其他</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+
+            
+
+        </div>
+    </aside>
+    
+    <!-- 主要内容区域 -->
+    <main class="main-content min-h-screen">
+        <!-- 导航栏 -->
+        <nav class="sticky top-0 z-40 bg-white py-4 px-6 shadow-sm transition-all duration-300" id="mainNav">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center">
+                    <a href="#" class="text-2xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-brain mr-2 text-blue-500"></i>
+                        <span>小瘦金</span>
+                    </a>
+                </div>
+                
+                <!-- 桌面端搜索框 -->
+                <div class="relative hidden md:block w-full max-w-md mx-auto">
+                    <input type="text" id="searchInput" placeholder="搜索文章..." class="search-input pl-10 pr-4 py-2 border border-gray-300 rounded-full text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all w-full">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                
+                <!-- 移动端搜索按钮 -->
+                <button class="md:hidden text-gray-600 focus:outline-none" id="mobileSearchButton">
+                    <i class="fas fa-search text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- 移动端搜索框 -->
+            <div class="hidden mt-4 md:hidden" id="mobileSearchContainer">
+                <div class="relative">
+                    <input type="text" id="mobileSearchInput" placeholder="搜索文章..." class="search-input pl-10 pr-4 py-2 border border-gray-300 rounded-full text-sm w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="blog-container py-8">
+            <!-- 首页英雄区域 -->
+            <section id="heroSection" class="relative h-screen flex items-center justify-center mb-12 overflow-hidden rounded-xl">
+                <!-- 右上角按钮 -->
+                <div class="absolute top-8 right-8 z-20 flex space-x-4">
+                    <a href="http://mc.666688.dpdns.org/" target="_blank" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-3 rounded-full backdrop-blur-sm transition-all duration-300 flex items-center">
+游戏
+                    </a>
+                    <a href="https://code.20066666.xyz//" target="_blank" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-3 rounded-full backdrop-blur-sm transition-all duration-300 flex items-center">
+代码
+                    </a>
+                </div>
+                <div class="absolute inset-0 z-0">
+                    <img src="https://p26-doubao-search-sign.byteimg.com/labis/ad4ebdfb673e36bce1e376ac13d00dd2~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&amp;x-expires=1781615703&amp;x-signature=Ny%2FDrWuaOrSVGVV1ERIhJWtKXuA%3D" alt="森林夜景" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+                </div>
+                <div class="relative z-10 text-center text-white px-4">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">探索生活的意义与美好</h1>
+                    <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">世界上只有一种英雄主义，就是在认清生活真相之后依然热爱生活。</p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="#articleList" class="btn-primary inline-flex items-center">
+                            开始阅读 <i class="fas fa-arrow-down ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="absolute bottom-10 left-0 right-0 flex justify-center animate-bounce">
+                    <a href="#articleList" class="text-white text-4xl">
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                </div>
+            </section>
+            
+            <!-- 文章列表区域 -->
+            <section id="articleList" class="mb-12">
+                <div class="flex justify-between items-center mb-8">
+                    <h1 class="text-3xl font-bold text-gray-800">最新文章</h1>
+                    
+                    <!-- 排序按钮 -->
+                    <div class="flex space-x-2">
+                        <button id="sortNewest" class="sort-btn active">
+                            <i class="fas fa-sort-amount-down mr-2"></i>最新
+                        </button>
+                        <button id="sortOldest" class="sort-btn">
+                            <i class="fas fa-sort-amount-up mr-2"></i>最早
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 文章列表 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="articlesGrid">
+                    <!-- 文章将通过JavaScript动态加载 -->
+                </div>
+                
+                <!-- 查看更多按钮 -->
+                <div class="text-center mt-10">
+                    <button id="loadMoreBtn" class="btn-primary inline-flex items-center">
+                        查看更多 <i class="fas fa-chevron-down ml-2"></i>
+                    </button>
+                </div>
+            </section>
+            
+            <!-- 文章详情区域（默认隐藏） -->
+            <section id="articleDetail" class="hidden fade-in">
+                <!-- 文章详情页英雄区域 -->
+                <section id="articleHeroSection" class="relative h-96 flex items-center justify-center mb-8 overflow-hidden rounded-xl">
+                    <div class="absolute inset-0 z-0">
+                        <img id="articleDetailHeroImage" src="" alt="文章封面" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+                    </div>
+                    <div class="relative z-10 text-center text-white px-4 max-w-4xl">
+                        <h1 id="articleDetailHeroTitle" class="text-3xl md:text-5xl font-bold mb-4 leading-tight"></h1>
+                        <div class="flex items-center justify-center space-x-4 text-sm md:text-base">
+                            <span id="articleDetailHeroAuthor" class="flex items-center"></span>
+                            <span class="opacity-70">•</span>
+                            <span id="articleDetailHeroDate" class="flex items-center"></span>
+                            <span class="opacity-70">•</span>
+                            <span id="articleDetailHeroReadTime" class="flex items-center"></span>
+                        </div>
+                    </div>
+                </section>
+                
+                <div class="flex items-center mb-6">
+                    <button id="backToList" class="btn-outline inline-flex items-center mr-4">
+                        <i class="fas fa-arrow-left mr-2"></i> 返回列表
+                    </button>
+                    <span class="text-sm text-gray-500" id="articleCategory">分类</span>
+                </div>
+                
+                <article class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="p-8 md:p-12">
+                        <div class="flex flex-wrap items-center justify-between mb-8 pb-6 border-b border-gray-100">
+                            <div class="flex items-center mb-4 md:mb-0">
+                                <img id="articleAuthorImage" src="" alt="作者头像" class="w-12 h-12 rounded-full mr-4">
+                                <div>
+                                    <div id="articleAuthorName" class="font-medium text-gray-800"></div>
+                                    <div id="articlePublishDate" class="text-sm text-gray-500"></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <span id="articleReadTime" class="text-sm text-gray-500"><i class="far fa-clock mr-1"></i></span>
+                            </div>
+                        </div>
+                        
+                        <div id="articleContent" class="article-content prose prose-lg max-w-none">
+                            <!-- 文章内容将通过JavaScript动态加载 -->
+                        </div>
+                        
+                        <div class="mt-10 pt-8 border-t border-gray-100">
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                <span class="text-sm font-medium text-gray-700">标签：</span>
+                                <div id="articleTags" class="flex flex-wrap gap-2">
+                                    <!-- 标签将通过JavaScript动态加载 -->
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <div class="flex space-x-4">
+                                    <button class="text-gray-500 hover:text-blue-500 transition-colors">
+                                        <i class="far fa-thumbs-up text-xl"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-blue-500 transition-colors">
+                                        <i class="far fa-bookmark text-xl"></i>
+                                    </button>
+                                    <button id="shareButton" class="text-gray-500 hover:text-blue-500 transition-colors">
+                                        <i class="far fa-share-square text-xl"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 分享成功提示 -->
+                            <div id="shareSuccessToast" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-80 text-white px-6 py-4 rounded-lg z-50 hidden">
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-circle mr-2"></i>
+                                    <span>链接复制成功，快去分享吧！</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                
+
+            </section>
+            
+            <!-- 搜索结果区域（默认隐藏） -->
+            <section id="searchResults" class="hidden fade-in">
+                <div class="flex items-center mb-8">
+                    <button id="backFromSearch" class="btn-outline inline-flex items-center mr-4">
+                        <i class="fas fa-arrow-left mr-2"></i> 返回
+                    </button>
+                    <h1 class="text-2xl font-bold text-gray-800">搜索结果: <span id="searchQueryText"></span></h1>
+                </div>
+                
+                <div id="searchResultsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 搜索结果将通过JavaScript动态加载 -->
+                </div>
+                
+                <div id="noResults" class="hidden text-center py-16">
+                    <div class="w-24 h-24 mx-auto mb-4 text-gray-300">
+                        <i class="fas fa-search text-6xl"></i>
+                    </div>
+                    <h3 class="text-xl font-medium text-gray-700 mb-2">未找到相关文章</h3>
+                    <p class="text-gray-500">请尝试使用其他关键词进行搜索</p>
+                </div>
+            </section>
+        </div>
+        
+        <!-- 页脚 -->
+        <footer class="bg-gray-800 text-white py-12">
+            <div class="blog-container">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="md:col-span-3 text-center">
+                        <h3 class="text-xl font-bold mb-4 flex items-center justify-center">
+                            <i class="fas fa-brain mr-2 text-blue-400"></i>
+                            小瘦金
+                        </h3>
+                        <p class="text-gray-400 mb-4 max-w-md mx-auto">探索生活的意义与美好，分享思考与感悟。</p>
+                        <div class="flex justify-center space-x-4 mb-8">
+                            <a href="https://space.bilibili.com/1167260492?spm_id_from=333.1007.0.0" target="_blank" class="text-gray-400 hover:text-blue-400 transition-colors">
+                                <i class="fab fa-bilibili"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
+                    <p>© chouye 个人博客. 保留所有权利.</p>
+                    
+                </div>
+            </div>
+        </footer>
+    </main>
+    
+    <!-- JavaScript -->
+    <script>
+        // 用户数据
+        const users = [
+            { id: 1, username: 'admin', password: 'admin123456', role: 'admin', name: '管理员', avatar: 'https://p26-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/409aa03553814ade942e5f19f660a55e.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251218213532CC70DC2DB176A6EB14F5&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1766669732&x-signature=SkOTPJdSwJXtBMVfTiw4qrDk4rk%3D' }
+        ];
+
+        // 当前登录用户
+        let currentUser = null;
+        let avatarClickCount = 0;
+
+        // 模拟从_posts/目录读取的Markdown文章数据
+        const markdownArticles = [
+            {
+                id: 1,
+                filename: "1.md",
+                hidden: false,
+                title: "Better MC服务器",
+                category: "生活",
+                categoryColor: "bg-yellow-500",
+                markdownContent: `解锁方块世界新体验！Better MC 1.20.1服务器邀你共赴冒险之旅`,
+                author: "小瘦金",
+                authorImage: "https://p26-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/409aa03553814ade942e5f19f660a55e.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251218213532CC70DC2DB176A6EB14F5&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1766669732&x-signature=SkOTPJdSwJXtBMVfTiw4qrDk4rk%3D",
+                publishDate: "2025-12-20",
+                readTime: "3分钟阅读",
+                image: "images/1.png",
+            }
+            ,
+            {
+                id: 2,
+                filename: "2.md",
+                hidden: false,
+                title: "第一个博客",
+                category: "思考",
+                categoryColor: "bg-purple-500",
+                markdownContent: `第一个博客`,
+                author: "小瘦金",
+                authorImage: "https://p26-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/409aa03553814ade942e5f19f660a55e.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251218213532CC70DC2DB176A6EB14F5&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1766669732&x-signature=SkOTPJdSwJXtBMVfTiw4qrDk4rk%3D",
+                publishDate: "2025-12-18",
+                readTime: "1分钟阅读",
+                image: "images/2.jpg",
+            },
+            {
+                id: 3,
+                filename: "3.md",
+                hidden: false,
+                title: "超酷特效代码一键get！",
+                category: "其他",
+                categoryColor: "bg-black-500",
+                markdownContent: `还在为找不到好看的网页特效代码发愁？想给项目添点节日氛围、浪漫元素，却苦于从零编写代码耗时费力？今天给大家安利一个宝藏代码展示网站——<https://code.20066666.xyz/，这里有超多现成的高颜值特效代码，一键下载就能直接用，不管是新手入门练手，还是开发者快速丰富项目效果，都能满足你的需求！>`,
+                author: "小瘦金",
+                authorImage: "https://p26-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/409aa03553814ade942e5f19f660a55e.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251218213532CC70DC2DB176A6EB14F5&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1766669732&x-signature=SkOTPJdSwJXtBMVfTiw4qrDk4rk%3D",
+                publishDate: "2025-12-20",
+                readTime: "5分钟阅读",
+                image: "images/3.png",
+            },
+            {
+                id: 4,
+                filename: "4.md",
+                hidden: false,
+                title: "冬至：昼短情长，暖待春来",
+                category: "生活",
+                categoryColor: "bg-yellow-500",
+                markdownContent: `冬至，是二十四节气中兼具自然与人文意义的重要节点。这一天，北半球昼最短、夜最长，此后白昼渐长，暗藏新生的希望。`,
+                author: "小瘦金",
+                authorImage: "https://p26-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/409aa03553814ade942e5f19f660a55e.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251218213532CC70DC2DB176A6EB14F5&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1766669732&x-signature=SkOTPJdSwJXtBMVfTiw4qrDk4rk%3D",
+                publishDate: "2025-12-21",
+                readTime: "2分钟阅读",
+                image: "images/4.png",
+            }
+        ];
+        
+        // DOM元素
+        const mainNav = document.getElementById('mainNav');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const mobileSearchButton = document.getElementById('mobileSearchButton');
+        const mobileSearchContainer = document.getElementById('mobileSearchContainer');
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        const articleList = document.getElementById('articleList');
+        const articleDetail = document.getElementById('articleDetail');
+        const searchResults = document.getElementById('searchResults');
+        const backToList = document.getElementById('backToList');
+        const backFromSearch = document.getElementById('backFromSearch');
+        const searchInput = document.getElementById('searchInput');
+        const mobileSearchInput = document.getElementById('mobileSearchInput');
+        const searchQueryText = document.getElementById('searchQueryText');
+        const searchResultsContainer = document.getElementById('searchResultsContainer');
+        const noResults = document.getElementById('noResults');
+        const readingProgress = document.getElementById('readingProgress');
+        const articlesGrid = document.getElementById('articlesGrid');
+        const sortNewestBtn = document.getElementById('sortNewest');
+        const sortOldestBtn = document.getElementById('sortOldest');
+
+        
+        // 存储当前显示的文章列表
+        let currentArticles = filterArticlesByPermission([...markdownArticles]);
+        let currentPage = 1;
+        const articlesPerPage = 3;
+        
+        // 侧边栏切换功能
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        });
+        
+        sidebarOverlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        });
+        
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                mainNav.classList.add('nav-scrolled');
+            } else {
+                mainNav.classList.remove('nav-scrolled');
+            }
+            
+            // 更新阅读进度条
+            const totalHeight = document.body.scrollHeight - window.innerHeight;
+            const progress = (window.scrollY / totalHeight) * 100;
+            readingProgress.style.width = progress + '%';
+        });
+        
+        // 移动端搜索框切换
+        mobileSearchButton.addEventListener('click', function() {
+            mobileSearchContainer.classList.toggle('hidden');
+            if (!mobileSearchContainer.classList.contains('hidden')) {
+                mobileSearchInput.focus();
+            }
+        });
+        
+        // 排序功能
+        sortNewestBtn.addEventListener('click', function() {
+            sortNewestBtn.classList.add('active');
+            sortOldestBtn.classList.remove('active');
+            sortArticles('newest');
+        });
+        
+        sortOldestBtn.addEventListener('click', function() {
+            sortOldestBtn.classList.add('active');
+            sortNewestBtn.classList.remove('active');
+            sortArticles('oldest');
+        });
+        
+        function sortArticles(order) {
+            const allArticles = filterArticlesByPermission([...markdownArticles]);
+            currentArticles = allArticles.sort((a, b) => {
+                const dateA = new Date(a.publishDate);
+                const dateB = new Date(b.publishDate);
+                return order === 'newest' ? dateB - dateA : dateA - dateB;
+            });
+            currentPage = 1;
+            renderArticles();
+        }
+        
+        // 根据权限过滤文章
+        function filterArticlesByPermission(articles) {
+            if (!currentUser) {
+                // 未登录用户只能看到未隐藏文章
+                return articles.filter(article => !article.hidden);
+            } else if (currentUser.role === 'admin') {
+                // 管理员可以看到所有文章
+                return articles;
+            } else {
+                // 普通用户只能看到未隐藏文章
+                return articles.filter(article => !article.hidden);
+            }
+        }
+        
+        // 查看更多按钮
+        loadMoreBtn.addEventListener('click', function() {
+            currentPage++;
+            renderArticles(true);
+            
+            // 检查是否还有更多文章
+            if (currentPage * articlesPerPage >= currentArticles.length) {
+                loadMoreBtn.classList.add('hidden');
+            }
+        });
+        
+        // 搜索功能
+        function setupSearch() {
+            [searchInput, mobileSearchInput].forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const query = this.value.trim().toLowerCase();
+                        if (query) {
+                            performSearch(query);
+                        }
+                    }
+                });
+            });
+        }
+        
+        function performSearch(query) {
+            const allArticles = filterArticlesByPermission([...markdownArticles]);
+            const results = allArticles.filter(article => 
+                article.title.toLowerCase().includes(query) || 
+                article.markdownContent.toLowerCase().includes(query) ||
+                (article.tags && article.tags.some(tag => tag.toLowerCase().includes(query)))
+            );
+            
+            searchQueryText.textContent = `"${query}"`;
+            searchResultsContainer.innerHTML = '';
+            
+            if (results.length > 0) {
+                noResults.classList.add('hidden');
+                results.forEach(article => {
+                    const articleElement = createArticleElement(article);
+                    searchResultsContainer.appendChild(articleElement);
+                    
+                    // 添加点击事件
+                    const titleElement = articleElement.querySelector('.article-title');
+                    titleElement.addEventListener('click', function() {
+                        window.open(`articles/${article.id}.html`, '_blank');
+                    });
+                });
+            } else {
+                noResults.classList.remove('hidden');
+            }
+            
+            // 隐藏文章列表和文章详情，显示搜索结果
+            articleList.classList.add('hidden');
+            articleDetail.classList.add('hidden');
+            searchResults.classList.remove('hidden');
+            
+            // 隐藏首页英雄区域
+            document.getElementById('heroSection').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // 显示文章详情 - 现在改为跳转到独立的文章页面
+        function showArticleDetail(articleId) {
+            window.open(`articles/${articleId}.html`, '_blank');
+        }
+        
+        // 创建文章元素
+        function createArticleElement(article) {
+            // 从Markdown内容中提取纯文本摘要
+            const plainText = article.markdownContent.replace(/[#*`>]/g, '').replace(/\n/g, ' ').substring(0, 150);
+            
+            const articleElement = document.createElement('article');
+            articleElement.className = 'bg-white rounded-xl shadow-md overflow-hidden card-hover fade-in';
+            articleElement.innerHTML = `
+                <div class="relative h-48 overflow-hidden">
+                    <img src="${article.image}" alt="${article.title}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                    <div class="absolute top-4 left-4 ${article.categoryColor} text-white text-xs font-semibold px-3 py-1 rounded-full">${article.category}</div>
+                </div>
+                <div class="p-6">
+                    <h2 class="text-xl font-bold mb-3 text-gray-800 hover:text-blue-500 transition-colors cursor-pointer article-title">
+                <a href="articles/${article.id}.html" target="_blank">${article.title}</a>
+            </h2>
+                    <p class="text-gray-600 mb-4 line-clamp-3">${plainText}...</p>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <img src="${article.authorImage}" alt="${article.author}" class="w-10 h-10 rounded-full mr-3">
+                            <span class="text-sm text-gray-500">${article.author} · ${article.publishDate}</span>
+                        </div>
+                        <span class="text-sm text-gray-500"><i class="far fa-clock mr-1"></i> ${article.readTime}</span>
+                    </div>
+                </div>
+            `;
+            return articleElement;
+        }
+        
+        // 渲染文章列表
+        function renderArticles(append = false) {
+            if (!append) {
+                articlesGrid.innerHTML = '';
+            }
+            
+            const startIndex = (currentPage - 1) * articlesPerPage;
+            const endIndex = Math.min(startIndex + articlesPerPage, currentArticles.length);
+            const articlesToRender = currentArticles.slice(startIndex, endIndex);
+            
+            articlesToRender.forEach(article => {
+                const articleElement = createArticleElement(article);
+                articlesGrid.appendChild(articleElement);
+                
+                // 添加点击事件
+                const titleElement = articleElement.querySelector('.article-title');
+                titleElement.addEventListener('click', function() {
+                    showArticleDetail(article.id);
+                });
+            });
+            
+            // 显示或隐藏"查看更多"按钮
+            if (endIndex >= currentArticles.length) {
+                loadMoreBtn.classList.add('hidden');
+            } else {
+                loadMoreBtn.classList.remove('hidden');
+            }
+        }
+        
+        // 返回列表按钮
+        backToList.addEventListener('click', function() {
+            // 隐藏文章详情，显示文章列表
+            articleDetail.classList.add('hidden');
+            articleList.classList.remove('hidden');
+            searchResults.classList.add('hidden');
+            
+            // 显示首页英雄区域
+            document.getElementById('heroSection').classList.remove('hidden');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        // 分享功能
+        const shareButton = document.getElementById('shareButton');
+        const shareSuccessToast = document.getElementById('shareSuccessToast');
+        
+        shareButton.addEventListener('click', function() {
+            // 获取当前页面的URL
+            const currentUrl = window.location.href;
+            
+            // 使用 Clipboard API 复制链接
+            navigator.clipboard.writeText(currentUrl).then(function() {
+                // 显示成功提示
+                shareSuccessToast.classList.remove('hidden');
+                
+                // 2秒后隐藏提示
+                setTimeout(function() {
+                    shareSuccessToast.classList.add('hidden');
+                }, 2000);
+            }).catch(function(err) {
+                console.error('无法复制链接: ', err);
+                alert('复制失败，请手动复制链接。');
+            });
+        });
+        
+        // 返回搜索前按钮
+        backFromSearch.addEventListener('click', function() {
+            searchResults.classList.add('hidden');
+            articleList.classList.remove('hidden');
+            
+            // 显示首页英雄区域
+            document.getElementById('heroSection').classList.remove('hidden');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+
+        
+        // 分类筛选功能
+        function setupCategoryFilter() {
+            const categoryLinks = document.querySelectorAll('.category-link');
+            categoryLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const category = this.dataset.category;
+                    
+                    // 筛选对应分类的文章
+                    const allArticles = filterArticlesByPermission([...markdownArticles]);
+                    currentArticles = allArticles.filter(article => article.category === category);
+                    currentPage = 1;
+                    
+                    // 更新页面标题
+                    document.querySelector('#articleList h1').textContent = `${category}文章`;
+                    
+                    // 渲染筛选后的文章
+                    renderArticles();
+                    
+                    // 在移动端点击分类后关闭侧边栏
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                        sidebarOverlay.classList.remove('active');
+                    }
+                    
+                    // 滚动到文章列表顶部
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+        }
+        
+        // 首页链接功能
+        function setupHomeLink() {
+            const homeLink = document.getElementById('homeLink');
+            homeLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 恢复到初始状态
+                currentArticles = filterArticlesByPermission([...markdownArticles]);
+                currentPage = 1;
+                
+                // 恢复页面标题
+                document.querySelector('#articleList h1').textContent = '最新文章';
+                
+                // 恢复排序按钮状态
+                sortNewestBtn.classList.add('active');
+                sortOldestBtn.classList.remove('active');
+                
+                // 重新渲染所有文章
+                renderArticles();
+                
+                // 在移动端点击后关闭侧边栏
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                }
+                
+                // 滚动到页面顶部
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+        
+        // 管理员登录模态框
+        const loginModal = document.createElement('div');
+        loginModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden';
+        loginModal.innerHTML = `
+            <div class="bg-white rounded-lg p-8 w-full max-w-md">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">管理员登录</h2>
+                    <button id="closeLoginModal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label for="username" class="block text-gray-700 mb-2">用户名</label>
+                        <input type="text" id="username" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入用户名" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="password" class="block text-gray-700 mb-2">密码</label>
+                        <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入密码" required>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">
+                        登录
+                    </button>
+                </form>
+                <div id="loginError" class="mt-4 text-red-500 text-center hidden"></div>
+            </div>
+        `;
+        document.body.appendChild(loginModal);
+
+        // 头像点击事件
+        const authorAvatar = document.querySelector('.sidebar .text-center img');
+        authorAvatar.addEventListener('click', function() {
+            avatarClickCount++;
+            if (avatarClickCount >= 5) {
+                loginModal.classList.remove('hidden');
+                avatarClickCount = 0;
+            }
+        });
+
+        // 关闭登录模态框
+        document.getElementById('closeLoginModal').addEventListener('click', function() {
+            loginModal.classList.add('hidden');
+            document.getElementById('loginError').classList.add('hidden');
+        });
+
+        // 登录表单提交
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginError = document.getElementById('loginError');
+
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                loginModal.classList.add('hidden');
+                // 显示管理员标识
+                if (user.role === 'admin') {
+                    document.getElementById('adminBadge').classList.remove('hidden');
+                }
+                // 重新渲染文章列表，因为权限可能已经改变
+                currentArticles = filterArticlesByPermission([...markdownArticles]);
+                renderArticles();
+                // 显示登录成功提示
+                const toast = document.createElement('div');
+                toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg z-50';
+                toast.innerHTML = '<i class="fas fa-check-circle mr-2"></i> 登录成功！';
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            } else {
+                loginError.textContent = '用户名或密码错误';
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            setupSearch();
+            setupCategoryFilter();
+            setupHomeLink();
+            // 默认按最新排序并渲染文章
+            sortArticles('newest');
+        });
+    </script>
+
+
+</body>
+</html>
